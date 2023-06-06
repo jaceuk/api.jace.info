@@ -71,7 +71,7 @@ app.post("/api/verify", async (req, res) => {
 // SEND EMAIL
 app.post("/api/send", function (req, res) {
   const mailOptions = {
-    from: req.body.email,
+    from: "noreply@jace.info",
     to: "info@jace.info",
     subject: `JACE.INFO contact form submission from ${req.body.name}`,
     html: `<p>You have a contact form submission</p>
