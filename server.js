@@ -1,16 +1,16 @@
-const express = require("express");
-const nodemailer = require("nodemailer");
-const cors = require("cors");
-require("dotenv").config();
-const axios = require("axios");
-const path = require("path");
+const express = require('express');
+const nodemailer = require('nodemailer');
+const cors = require('cors');
+require('dotenv').config();
+const axios = require('axios');
+const path = require('path');
 
 const app = express();
 
-const root = path.join(__dirname, "client", "build");
+const root = path.join(__dirname, 'client', 'build');
 app.use(express.static(root));
 
-const EMAIL_FROM = "noreply@jace.info";
+const EMAIL_FROM = 'noreply@jace.info';
 
 // middleware
 app.use(express.json());
@@ -23,6 +23,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 // verify connection configuration
@@ -33,19 +36,19 @@ transporter.verify((err, success) => {
 });
 
 // RECAPTCHA
-app.post("/api/verify", async (req, res) => {
-  const captchaURL = "https://www.google.com/recaptcha/api/siteverify";
+app.post('/api/verify', async (req, res) => {
+  const captchaURL = 'https://www.google.com/recaptcha/api/siteverify';
   // Get the token from the form
-  const key = req.body["gRecaptchaResponse"];
+  const key = req.body['gRecaptchaResponse'];
 
-  if (!key) res.json({ status: "fail" });
+  if (!key) res.json({ status: 'fail' });
 
   const response = await axios({
     url: captchaURL,
-    method: "POST",
+    method: 'POST',
     // reCaptcha demands x-www-form-urlencoded requests
     headers: {
-      ContentType: "application/x-www-form-urlencoded; charset=utf-8",
+      ContentType: 'application/x-www-form-urlencoded; charset=utf-8',
     },
     params: {
       secret: process.env.RECAPTCHA_SECRET_KEY,
@@ -69,10 +72,10 @@ app.post("/api/verify", async (req, res) => {
 });
 
 // SEND EMAIL
-app.post("/api/send", function (req, res) {
+app.post('/api/send', function (req, res) {
   const mailOptions = {
-    from: "noreply@jace.info",
-    to: "info@jace.info",
+    from: 'noreply@jace.info',
+    to: 'info@jace.info',
     subject: `JACE.INFO contact form submission from ${req.body.name}`,
     html: `<p>You have a contact form submission</p>
       <p><strong>Email: </strong> ${req.body.email}</p>
@@ -86,7 +89,7 @@ app.post("/api/send", function (req, res) {
         status: 500,
       });
     } else {
-      console.log("== Message Sent ==");
+      console.log('== Message Sent ==');
       res.json({
         status: 200,
       });
@@ -95,14 +98,14 @@ app.post("/api/send", function (req, res) {
 });
 
 // HEALTH CHECK
-app.get("/_health", (req, res) => {
-  res.status(200).send("ok");
+app.get('/_health', (req, res) => {
+  res.status(200).send('ok');
 });
 
 // Handles any requests that don't match the ones above
 // Check if maintenance mode is enabled
-app.get("*", (req, res) => {
-  res.sendFile("index.html", { root });
+app.get('*', (req, res) => {
+  res.sendFile('index.html', { root });
 });
 
 const port = 5000;
